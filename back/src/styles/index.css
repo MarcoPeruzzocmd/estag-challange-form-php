@@ -1,0 +1,274 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif;
+
+}
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+nav {
+    background-color: #6A65FF;
+    width: 100%;
+    height: 9vh;
+    display: flex;
+    align-items: center;
+}
+
+nav>ul {
+    display: flex;
+    list-style: none;
+    align-items: center;
+    margin: 20px;
+}
+
+li {
+    margin: 10px;
+}
+
+.links {
+    display: flex;
+    margin: 0.5rem;
+}
+
+a {
+    color: black;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    height: 80vh;
+}
+
+.fCart {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 10px;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.fCart>input, select {
+    width: 95%;
+    height: 24px;
+    border-radius: 5px;
+    border: 0.5px solid black;
+    padding: 1.5px;
+}
+
+.fCart>button {
+    width: 95%;
+    height: 30px;
+    border-radius: 5px;
+    border: none;
+    background-color: #6A65FF;
+    cursor: pointer;
+}
+.inputCima{
+    width: 95%;
+    display: flex;
+    align-items: center;
+ 
+}
+.inputCima > select{
+    border-radius: 5px;
+    border: 0.5px black solid;
+    padding: 1px;
+    width: 100%;
+    height: 24px;
+}
+.inputBaixo {
+    width: 95%;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    border-radius: 5px;
+}
+.inputBaixo > input{
+    padding: 3px;
+    height: 20px;
+}
+.amountInput {
+    width: 50%;
+    border-radius: 5px;
+    border: 0.5px solid black;
+}
+
+.priceInput {
+    width: 25%;
+    border-radius: 5px;
+    border: 1px solid #C5C5C5;
+}
+
+.taxInput {
+    width: 25%;
+    border-radius: 5px;
+    border: 1px solid #C5C5C5;
+}
+.fProduct{
+    width: 50%;
+    height: 100%;
+    margin-top: 20px;
+}
+.tableCart{
+    max-width: 100%;
+    height: 100%;
+    margin-right: 20px;
+}
+.tableCart.scrollable {
+    max-height: 50vh;
+    overflow-y: auto;
+}
+table{
+    width: 100%;
+    border-collapse: collapse;
+}
+td{
+    border-bottom: 1px solid #C5C5C5;
+    height: 25px;
+    padding: 4px;
+}
+th{
+    border-bottom: 1px solid #C5C5C5;
+    text-align: start;
+    padding: 4px;
+}
+
+.thProduct{
+    width: 35%;
+}
+.thAmount{
+    width: 18%;
+}
+.thTotal{
+    width: 13%;
+}
+.thPrice{
+    width: 15%;
+}
+.thTax{
+    width: 15%;
+}
+#line1,#line2{
+    position: relative;
+}
+#line1::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  height: 60vh;
+  border-left: 1px solid  #C5C5C5;
+}
+ 
+#line2::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 60vh;
+  border-left: 1px solid  #C5C5C5;
+  border-right: 1px solid  #C5C5C5;
+}
+.tdButton1{
+    display: flex;
+    align-items: center;
+}
+.tdButton2{
+    display: flex;
+    align-items: center;
+}
+.finalCart{
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.bottomCart{
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+}
+
+.pTax{
+    display: flex;
+    gap: 3px;
+    align-items: center;
+}
+.pTotal{
+    display: flex;
+    margin-top: 5px;
+    gap: 3px;
+    align-items: center;
+}
+
+.buttonsCart{
+    margin:20px 10px;
+}
+.buttonsCart > button{
+    width: 150px;
+    border-radius: 5px;
+    border: none;
+    height: 25px;
+    cursor: pointer;
+}
+.cancel{
+    background-color: #C5C5C5;
+}
+.finish{
+    background-color: #6A65FF;
+}
+.delete1{
+    visibility: hidden;
+    background-color: #6A65FF;
+    border-radius: 3px;
+    border: none;
+    color: white;
+    font-size: 12px;
+    width: 70%;
+    height: 20px;
+    margin: auto;
+    cursor: pointer;
+}
+.delete2{
+    visibility: hidden;
+    background-color: #6A65FF;
+    border-radius: 3px;
+    border: none;
+    color: white;
+    font-size: 12px;
+    width: 70%;
+    height: 20px;
+    margin: auto;
+    cursor: pointer;
+}
+
+.product1:hover{
+    .delete1{
+        visibility: visible;
+    }
+}
+.product2:hover{
+    .delete2{
+        visibility: visible;
+    }
+}
+@media (max-width: 1300px){
+    .thProduct{
+        width: 25%;
+    }
+    .thPrice{
+        width: 18%;
+    }
+    .thTotal{
+        width: 16%;
+    }
+    th,td{
+        padding: 5px;
+    }
+}
