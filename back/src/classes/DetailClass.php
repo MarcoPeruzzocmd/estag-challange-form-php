@@ -6,14 +6,14 @@ class Detail {
         $this->myPDO = $myPDO;
     }
     public function viewDetail ($code){
-        $sql = "SELECT o.code, o.date, oi.product_code, oi.amount, p.name AS product_name, c.tax
-                FROM orders o
-                JOIN order_item oi ON o.code = oi.order_code
-                JOIN products p ON oi.product_code = p.code
-                JOIN categories c ON p.category_code = c.code
-                WHERE o.code = ?";
+        $sql = "SELECT o.code, p.name as product_name, c.name as category_name, oi.amount, p.price, oi.tax, oi.price, o.data_compra, o.hora_compra FROM orders o
+        INNER JOIN order_item oi ON oi.order_code = o.code
+        INNER JOIN products p ON p.code = oi.product_code
+        INNER JOIN categories c ON c.code = p.category_code
+        WHERE o.code = ?";
         $statement = $this->myPDO->prepare($sql);
         $statement->execute([$code]);
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
     }
 }

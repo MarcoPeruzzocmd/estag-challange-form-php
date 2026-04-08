@@ -1,6 +1,4 @@
 <?php
-error_log('Sou um log');
-
 $host = "pgsql_desafio";
 $db = "applicationphp";
 $user = "root";

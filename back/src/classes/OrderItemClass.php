@@ -5,6 +5,9 @@ class OrderItem {
     public function __construct($myPDO){
         $this->myPDO = $myPDO;
     }
+    public function getPDO(){
+        return $this->myPDO;
+    }
     public function createOrder ($productCode, $amount){
         $sql = "SELECT amount FROM products WHERE code = ? AND amount < ?";
         $statement = $this->myPDO->prepare($sql);
@@ -41,7 +44,7 @@ class OrderItem {
         exit();
     }
     public function getOrders(){
-        $sql = "SELECT *, price + tax AS total FROM order_item";
+        $sql = "SELECT *, price + tax AS total FROM order_item WHERE order_code IS NULL";
         $statement = $this->myPDO->query($sql);
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -57,7 +60,7 @@ class OrderItem {
         $totalTax = 0;
         foreach ($orders as $order) {
             $totalTax += $order['tax'];
-            $totalPrice += $order['price'] + $totalTax;
+            $totalPrice += $order['price'];
         }
         return ['totalPrice' => $totalPrice, 'totalTax' => $totalTax];
     }
@@ -71,10 +74,10 @@ class OrderItem {
             return;
         }
 
-        $sql = "INSERT INTO orders (total, tax) VALUES (?,?) RETURNING code";
+        $sql = "INSERT INTO orders (total, tax, data_compra, hora_compra) VALUES (?, ?, ?, ?) RETURNING code";
         $totals = $this->calculateTotalAndTax();
         $statement = $this->myPDO->prepare($sql);
-        $statement->execute([$totals['totalPrice'], $totals['totalTax']]);
+        $statement->execute([$totals['totalPrice'], $totals['totalTax'], date('Y-m-d'), date('H:i:s')]);
 
         $order = $statement->fetch(PDO::FETCH_ASSOC);
         $orderCode = $order['code'];
@@ -87,6 +90,7 @@ class OrderItem {
         $this->myPDO->prepare($sql)->execute([$orderCode]);
         header("Location: history.php");
         exit();
+        
 
     }
 }

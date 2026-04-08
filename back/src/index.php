@@ -3,23 +3,37 @@ require_once 'conn.php';
 require_once 'controllers/ProductController.php';
 require_once 'controllers/OrderItemController.php';
 require_once 'controllers/CategoryController.php';
+
 $productController = new ProductController($myPDO);
+$categoryController = new CategoryController($myPDO);
 $products = $productController->indexProducts();
+$categories = $categoryController->indexCategories();
 $orderItemController = new OrderItemController($myPDO);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['add'])) {
-        $orderItemController->createOrderItem($_POST['product'], $_POST['amount']);
+        if (empty($_POST['product']) || empty($_POST['amount'])) {
+            echo "<script>alert('Preencha todos os campos antes de adicionar ao carrinho.');</script>";
+        }
+        else if ($_POST['amount'] <= 0) {
+            echo "<script>alert('O campo de quantidade deve ser um número positivo.');</script>";
+        }
+        else {
+            $orderItemController->createOrderItem($_POST['product'] ?? '', $_POST['amount'] ?? '');
+        }
     }
+
     if (isset($_POST['delete'])) {
         $orderItemController->deleteOrderItem($_POST['code']);
     }
-    if(isset($_POST['finish'])){
+    if (isset($_POST['finish'])) {
         $orderItemController->finishOrder($_POST['finish']);
     }
 }
 $ordersItem = $orderItemController->indexOrderItem();
 $totalsValues = $orderItemController->calculateTotalAndTax();
 ?>
+
 <!doctype html>
 <html lang="pt-br">
 
@@ -51,7 +65,7 @@ $totalsValues = $orderItemController->calculateTotalAndTax();
                 <select id="select" name="product" placeholder="Product">
                     <?php
                     if ((!isset($products)) || count($products) <= 0) {
-                        echo "<option value='' selected disabled>Não existem produtos</option>";
+                        echo "<option value='' id='optSelecione' selected disabled>Não existem produtos</option>";
                     } else {
                         echo "<option value='' disabled selected>Selecione um produto</option>";
                     }
@@ -115,8 +129,8 @@ $totalsValues = $orderItemController->calculateTotalAndTax();
                 <div class="finalCart">
                     <div class="bottomCart">
                         <div class="pTax">
-                            <h5 style="font-size: 17px">Tax:</h5> 
-                            <p id="textTotalTax" style="font-size: 15px" >R$ <?= number_format($totalsValues['totalTax'], 2, ',', '.') ?></p>
+                            <h5 style="font-size: 17px">Tax:</h5>
+                            <p id="textTotalTax" style="font-size: 15px">R$ <?= number_format($totalsValues['totalTax'], 2, ',', '.') ?></p>
                         </div>
                         <div class="pTotal">
                             <h5 style="font-size: 17px">Total:</h5>
@@ -131,7 +145,27 @@ $totalsValues = $orderItemController->calculateTotalAndTax();
             </div>
         </form>
     </div>
-    <script src="scripts/home.js"></script>
+    <script src="scripts/index.js"></script>
 </body>
 
 </html>
+
+<script>
+    const select = document.getElementById("select");
+    const newPrice = document.getElementById("price");
+    const tax = document.getElementById("tax");
+    const amount = document.getElementById("amount");
+    const products = <?php echo json_encode($products); ?>;
+    const categories = <?php echo json_encode($categories); ?>;
+    select.addEventListener("change", function() {
+        const selectedProduct = products.find(product => product.code == Number(this.value));
+        const selectedCategory = categories.find(category => category.code == selectedProduct.category_code);
+        if (selectedProduct && selectedCategory) {
+            newPrice.value = selectedProduct.price;
+            tax.value = selectedCategory.tax;
+        } else {
+            newPrice.value = "";
+            tax.value = "";
+        }
+    });
+</script>

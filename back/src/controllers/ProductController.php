@@ -1,9 +1,14 @@
 <?php
 require_once 'classes/ProductClass.php';
+require_once 'controllers/CategoryController.php';
 class ProductController {
     private $product;
+    private $categoryController;
+    private $myPDO;
     public function __construct($myPDO) {
         $this->product = new Product($myPDO);
+        $this->categoryController = new CategoryController($myPDO);
+        $this->myPDO = $myPDO;
     }
     public function indexProducts(){
         return $this->product->getProducts();
@@ -32,13 +37,44 @@ class ProductController {
         $this->product->createProduct($name, $amount, $price, $category);
     }
     public function deleteProduct($code) {
+        $sql = "SELECT * FROM order_item WHERE product_code = ?";
+        $statement = $this->myPDO->prepare($sql);
+        $statement->execute([$code]);
+        $categories = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        if(!empty($categories)){
+            echo "<script>alert('Esse produto não pode ser deletado, pois esta associado a um carrinho ou compra.');</script>";
+            return;
+        }
         $this->product->deleteProduct($code);
+
     }
     public function existProduct($name)
     {
         foreach ($this->product->getProducts() as $prod) {
             if (strtolower(trim($prod['name'])) == strtolower(trim($name))) {
                 return true;
+            }
+        }
+    }
+    public function getTaxByProductCode($code) {
+        $products = $this->indexProducts();
+        $categoryController = $this->categoryController->indexCategories();
+        foreach($products as $product){
+            if($product['code'] == $code){
+                foreach($categoryController as $category){
+                    if($category['code'] == $product['category_code']){
+                        return $category['tax'];
+                    }
+                }
+            }
+        }
+    }
+    public function getProductByCode($code) {
+        $products = $this->indexProducts();
+        foreach($products as $product){
+            if($product['code'] == $code){
+                return $product;
             }
         }
     }

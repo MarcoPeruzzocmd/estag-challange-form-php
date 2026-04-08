@@ -9,7 +9,7 @@ $categoryController = new CategoryController($myPDO);
 $categories = $categoryController->indexCategories();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (isset($_POST['add'])) {
-    $productController->createProduct($_POST['product'], $_POST['amount'], $_POST['price'], $_POST['category']);
+    $productController->createProduct($_POST['product'], $_POST['amount'] ?? '', $_POST['price'] ??'', $_POST['category'] ?? '');
   } elseif (isset($_POST['delete'])) {
     $productController->deleteProduct($_POST['code']);
   }

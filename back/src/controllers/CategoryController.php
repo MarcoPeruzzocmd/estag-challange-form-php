@@ -1,15 +1,14 @@
 <?php
 require_once 'classes/CategoryClass.php';
-require_once 'ProductController.php';
 class CategoryController
 {
     private $category;
-    private $productController;
+    private $myPDO;
     public function __construct($myPDO)
     {
         $this->category = new Category($myPDO);
-        $this->productController = new ProductController($myPDO);
-    }
+        $this->myPDO = $myPDO;
+    }   
     public function indexCategories()
     {
         return $this->category->getCategories();
@@ -40,14 +39,17 @@ class CategoryController
     }
     public function deleteCategory($code)
     {
-        foreach ($this->productController->indexProducts() as $product) {
-            if ($code == $product['category_code']) {
-                echo "<script>alert('Essa categoria não pode ser deletada, pois existem produtos associados a ela.');</script>";
-                return;
-            } else {
-                $this->category->deleteCategory($code);
-            }
+        $sql = "SELECT * FROM products WHERE category_code = ?";
+        $statement = $this->myPDO->prepare($sql);
+        $statement->execute([$code]);
+        $products = $statement->fetchAll(PDO::FETCH_ASSOC);
+        
+        if (!empty($products)) {
+            echo "<script>alert('Essa categoria não pode ser deletada, pois existem produtos associados a ela.');</script>";
+            return;
         }
+        
+        $this->category->deleteCategory($code);
     }
     public function existCategory($category)
     {

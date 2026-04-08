@@ -1,8 +1,9 @@
 <?php
 require_once 'conn.php';
-require_once 'classes/DetailClass.php';
-$ordersDetail = new Detail($myPDO);
-$ordersDetail->viewDetail($_GET['code']);
+require_once 'controllers/DetailController.php';
+$detailController = new DetailController($myPDO);
+$code = $_GET['code'];
+$details = $detailController->viewDetail($code);
 ?>
 
 <!DOCTYPE html>
@@ -35,7 +36,21 @@ $ordersDetail->viewDetail($_GET['code']);
                     <th id="line1">Date</th>
                     <th id="line2">Hour</th>
                 </tr>
-                <tbody id="table"></tbody>
+                <tbody id="table">
+                    <?php foreach ($details as $detail) { ?>
+                        <tr>
+                            <td id="line1"><?php echo $detail['code']; ?></td>
+                            <td id="line1"><?php echo $detail['product_name']; ?></td>
+                            <td id="line1"><?php echo $detail['category_name']; ?></td>
+                            <td id="line1"><?php echo $detail['amount']; ?></td>
+                            <td id="line1"><?php echo $detail['price']; ?></td>
+                            <td id="line1"><?php echo $detail['tax']; ?></td>
+                            <td id="line1"><?php echo number_format($detail['price'] + $detail['tax'], 2, ',', '.'); ?></td>
+                            <td id="line1"><?php echo $detail['data_compra']; ?></td>
+                            <td id="line1"><?php echo $detail['hora_compra']; ?></td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
             </table>
         </div>
     </div>
