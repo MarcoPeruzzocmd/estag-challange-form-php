@@ -43,8 +43,8 @@ $ordersHistory = $ordersController->indexOrdersHistory();
                     <?php foreach ($ordersHistory as $order): ?>
                         <tr class="product1">
                             <td class="tdCode"><?= $order['code'] ?></td>
-                            <td class="tdTax"><?= $order['tax'] ?></td>
-                            <td class="tdTotal"><?= number_format($order['total'] + $order['tax'], 2, ',', '.') ?></td>
+                            <td class="tdTax">R$ <?= number_format($order['tax'], 2, ',', '.')?></td>
+                            <td class="tdTotal">R$ <?= number_format($order['total'] + $order['tax'], 2, ',', '.') ?></td>
                             <td class="tdButton1"><a href="detail.php?code=<?= $order['code'] ?>"><button class="delete1" data-code="<?= $order['code'] ?>">View Details</button></a></td>
                         </tr>
                     <?php endforeach; ?>

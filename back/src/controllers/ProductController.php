@@ -15,24 +15,29 @@ class ProductController {
     }
     public function createProduct($name, $amount, $price, $category) {
         if (empty($name) || empty($amount) || empty($price) || empty($category)) {
-            echo"<script>alert('Preencha todos os campos.');</script>";
-            return;
+            $_SESSION['error'] = 'Preencha todos os campos possíveis.';
+            header("Location: product.php");
+            exit();
         }
         if (!is_numeric($amount) || $amount < 0) {
-            echo"<script>alert('O campo de quantidade deve ser um número positivo.');</script>";
-            return;
+            $_SESSION['error'] = 'O campo de quantidade deve ser um número positivo';
+            header("Location: product.php");
+            exit();
         }
         if (!is_numeric($price) || $price < 0) {
-            echo"<script>alert('O campo de preço deve ser um número positivo.');</script>";
-            return;
+            $_SESSION['error'] = 'O campo de preço deve ser um número positivo';
+            header("Location: product.php");
+            exit();
         }
         if (strlen($name) > 30) {
-            echo"<script>alert('O nome do produto deve ter no máximo 30 caracteres.');</script>";
-            return;
+            $_SESSION['error'] = 'O nome do produto deve ter no mínimo 30 caracteres.';
+            header("Location: product.php");
+            exit();
         }
         if ($this->existProduct($name)) {
-            echo"<script>alert('Esse produto já existe.');</script>";
-            return;
+            $_SESSION['error'] = 'Esse produto já existe.';
+            header("Location: product.php");
+            exit();
         }
         $this->product->createProduct($name, $amount, $price, $category);
     }
@@ -43,8 +48,9 @@ class ProductController {
         $categories = $statement->fetchAll(PDO::FETCH_ASSOC);
 
         if(!empty($categories)){
-            echo "<script>alert('Esse produto não pode ser deletado, pois esta associado a um carrinho ou compra.');</script>";
-            return;
+            $_SESSION['error'] = 'Esse produto não pode ser deletado pois já está associado a um carrinho ou compra';
+            header("Location: product.php");
+            exit();
         }
         $this->product->deleteProduct($code);
 

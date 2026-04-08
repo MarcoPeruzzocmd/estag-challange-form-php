@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once 'conn.php';
 require_once 'controllers/ProductController.php';
 require_once 'controllers/OrderItemController.php';
@@ -13,10 +14,12 @@ $orderItemController = new OrderItemController($myPDO);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['add'])) {
         if (empty($_POST['product']) || empty($_POST['amount'])) {
-            echo "<script>alert('Preencha todos os campos antes de adicionar ao carrinho.');</script>";
+        $_SESSION['error'] = 'Preencha todos os campos antes de adicionar ao carrinho.';
+        header("Location: index.php");
+        exit();
         }
         else if ($_POST['amount'] <= 0) {
-            echo "<script>alert('O campo de quantidade deve ser um número positivo.');</script>";
+            $_SESSION['error'] = 'O número de quantidade precisa ser positivo.';
         }
         else {
             $orderItemController->createOrderItem($_POST['product'] ?? '', $_POST['amount'] ?? '');
@@ -43,7 +46,10 @@ $totalsValues = $orderItemController->calculateTotalAndTax();
     <link rel="stylesheet" href="styles/index.css" />
     <title>Suite Store</title>
 </head>
-
+<?php if (isset($_SESSION['error'])): ?>
+    <script>alert('<?= $_SESSION['error'] ?>')</script>
+    <?php unset($_SESSION['error']); ?>
+<?php endif; ?>
 <body>
     <nav class="menu">
         <ul>
@@ -112,10 +118,10 @@ $totalsValues = $orderItemController->calculateTotalAndTax();
                                     }
                                     ?>
                                 </td>
-                                <td class="tdPrice"><?= $orderItem['price'] ?></td>
+                                <td class="tdPrice">R$ <?= number_format($orderItem['price'], 2, ',', '.') ?></td>
                                 <td class="tdAmount"><?= $orderItem['amount'] ?></td>
-                                <td class="tdTax"><?= $orderItem['tax'] ?></td>
-                                <td class="tdTotal"><?= $orderItem['total'] ?></td>
+                                <td class="tdTax">R$ <?= number_format($orderItem['tax'], 2, ',', '.') ?></td>
+                                <td class="tdTotal">R$ <?= number_format($orderItem['total'], 2, ',', '.') ?></td>
                                 <td class="tdButton1">
                                     <form method="POST" style="display:inline;">
                                         <input type="hidden" name="code" value="<?= $orderItem['code'] ?>">
@@ -146,6 +152,7 @@ $totalsValues = $orderItemController->calculateTotalAndTax();
         </form>
     </div>
     <script src="scripts/index.js"></script>
+    <?php require_once 'alert.php'; ?>
 </body>
 
 </html>
@@ -161,8 +168,18 @@ $totalsValues = $orderItemController->calculateTotalAndTax();
         const selectedProduct = products.find(product => product.code == Number(this.value));
         const selectedCategory = categories.find(category => category.code == selectedProduct.category_code);
         if (selectedProduct && selectedCategory) {
-            newPrice.value = selectedProduct.price;
-            tax.value = selectedCategory.tax;
+            let selectedPrice = parseFloat(selectedProduct.price)
+            let selectTax = parseFloat(selectedCategory.tax)
+            const priceFormated = `${selectedPrice.toLocaleString("pt-BR", {
+                style: 'currency',
+                currency: "BRL"
+            })}`
+            const taxFormated = `${(selectTax / 100).toLocaleString("pt-BR", {
+                style: 'percent',
+                maximumFractionDigits: 2,
+            })}`
+            newPrice.value = priceFormated;
+            tax.value = taxFormated;
         } else {
             newPrice.value = "";
             tax.value = "";

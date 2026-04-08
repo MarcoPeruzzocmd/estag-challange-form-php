@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once 'conn.php';
 require_once 'classes/ProductClass.php';
 require_once 'controllers/ProductController.php';
@@ -81,7 +82,7 @@ $products = $productController->indexProducts();
                 <td class="tdCode"><?= $product['code'] ?></td>
                 <td class="tdProduct"><?= $product['name'] ?></td>
                 <td class="tdAmount"><?= $product['amount'] ?></td>
-                <td class="tdPrice"><?= $product['price'] ?></td>
+                <td class="tdPrice">R$<?= number_format($product['price'], 2, ',', '.')?></td>
                 <td class="tdCategory">
                   <?php
                   foreach ($categories as $category) {
@@ -106,6 +107,7 @@ $products = $productController->indexProducts();
     </div>
   </div>
   <script src="scripts/product.js"></script>
+  <?php require_once 'alert.php'; ?>
 </body>
 
 </html>

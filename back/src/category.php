@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once 'conn.php';
 require_once 'controllers/CategoryController.php';
 $categoryController = new CategoryController($myPDO);
@@ -57,7 +58,7 @@ $categories = $categoryController->indexCategories();
                             <tr class="product1">
                                 <td class="tdCode"><?= $category['code'] ?></td>
                                 <td class="tdCategory"><?= $category['name'] ?></td>
-                                <td class="tdTax"><?= $category['tax'] ?></td>
+                                <td class="tdTax"><?= number_format($category['tax'], 2, ',', '.')?>%</td>
                                 <td class="tdButton1">
                                     <form method="POST" style="display:inline;">
                                         <input type="hidden" name="code" value="<?= $category['code'] ?>">
@@ -72,6 +73,7 @@ $categories = $categoryController->indexCategories();
         </div>
     </div>
     <script src="scripts/category.js"></script>
+    <?php require_once 'alert.php'; ?>
 </body>
 
 </html>
