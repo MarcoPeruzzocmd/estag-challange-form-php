@@ -16,24 +16,29 @@ class CategoryController
     public function createCategory($category, $tax)
     {
         if (empty($category) || empty($tax)) {
-            echo "<script>alert('Preencha todos os campos.');</script>";
-            return;
+            $_SESSION['error'] = 'Preencha todos os campos';
+            header("Location: category.php");
+            exit();
         }
         if (!is_numeric($tax) || $tax < 0) {
-            echo "<script>alert('O campo de imposto deve ser um número positivo.');</script>";
-            return;
+            $_SESSION['error'] = 'O campo de imposto deve ser um número positivo';
+            header("Location: category.php");
+            exit();
         }
         if (strlen($category) > 30) {
-            echo "<script>alert('O nome da categoria deve ter no máximo 30 caracteres.');</script>";
-            return;
+            $_SESSION['error'] = 'O nome da categoria deve ter no máximo 30 caractéres';
+            header("Location: category.php");
+            exit();
         }
         if ($tax > 100) {
-            echo "<script>alert('O valor do imposto é muito grande.');</script>";
-            return;
+            $_SESSION['error'] = 'O valor de impor deve ser de no máximo 100%';
+            header("Location: category.php");
+            exit();
         }
         if ($this->existCategory($category)) {
-            echo "<script>alert('Essa categoria já existe.');</script>";
-            return;
+            $_SESSION['error'] = 'Essa categoria já existe';
+            header("Location: category.php");
+            exit();
         }
         $this->category->createCategory($category, $tax);
     }
