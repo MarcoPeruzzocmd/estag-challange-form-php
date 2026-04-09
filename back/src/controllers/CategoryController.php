@@ -20,8 +20,13 @@ class CategoryController
             header("Location: category.php");
             exit();
         }
-        if (empty($category) || empty($tax)) {
-            $_SESSION['error'] = 'Preencha todos os campos';
+        if (empty($category)) {
+            $_SESSION['error'] = 'Preencha o campo de categoria';
+            header("Location: category.php");
+            exit();
+        }
+        if ($tax === '' || $tax ===  null) {
+            $_SESSION['error'] = 'Preencha o campo de taxa';
             header("Location: category.php");
             exit();
         }
