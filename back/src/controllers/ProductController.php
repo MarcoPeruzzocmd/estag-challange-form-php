@@ -14,6 +14,16 @@ class ProductController {
         return $this->product->getProducts();
     }
     public function createProduct($name, $amount, $price, $category) {
+        if (!preg_match('/^[a-zA-ZÀ-ÿ][a-zA-ZÀ-ÿ0-9\s]*$/', $name)){
+            $_SESSION['error'] = 'O primeiro caractere precisa obrigatoriamente ser uma letra.';
+            header("Location: product.php");
+            exit();
+        }
+        if ($amount > 100000) {
+            $_SESSION['error'] = 'A quantidade do produto deve ser de no máximo 100000 unidades';
+            header('Location: product.php');
+            exit();
+        } 
         if (empty($name) || empty($amount) || empty($price) || empty($category)) {
             $_SESSION['error'] = 'Preencha todos os campos possíveis.';
             header("Location: product.php");
@@ -57,8 +67,10 @@ class ProductController {
     }
     public function existProduct($name)
     {
+        $normalized = strtolower(preg_replace('/\s+/', ' ', trim($name)));
         foreach ($this->product->getProducts() as $prod) {
-            if (strtolower(trim($prod['name'])) == strtolower(trim($name))) {
+        $existingName = strtolower(preg_replace('/\s+/', ' ', trim($prod['name'])));
+            if ($existingName == $normalized) {
                 return true;
             }
         }

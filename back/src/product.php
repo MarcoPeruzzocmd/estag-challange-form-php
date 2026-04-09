@@ -10,7 +10,7 @@ $categoryController = new CategoryController($myPDO);
 $categories = $categoryController->indexCategories();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (isset($_POST['add'])) {
-    $productController->createProduct($_POST['product'], $_POST['amount'] ?? '', $_POST['price'] ??'', $_POST['category'] ?? '');
+    $productController->createProduct($_POST['product'], $_POST['amount'] ?? '', $_POST['price'] ?? '', $_POST['category'] ?? '');
   } elseif (isset($_POST['delete'])) {
     $productController->deleteProduct($_POST['code']);
   }
@@ -82,7 +82,7 @@ $products = $productController->indexProducts();
                 <td class="tdCode"><?= $product['code'] ?></td>
                 <td class="tdProduct"><?= $product['name'] ?></td>
                 <td class="tdAmount"><?= $product['amount'] ?></td>
-                <td class="tdPrice">R$<?= number_format($product['price'], 2, ',', '.')?></td>
+                <td class="tdPrice">R$<?= number_format($product['price'], 2, ',', '.') ?></td>
                 <td class="tdCategory">
                   <?php
                   foreach ($categories as $category) {
@@ -106,8 +106,78 @@ $products = $productController->indexProducts();
       </div>
     </div>
   </div>
-  <script src="scripts/product.js"></script>
   <?php require_once 'alert.php'; ?>
 </body>
 
 </html>
+<script>
+  const productName = document.getElementById("product");
+  const newPrice = document.getElementById("price");
+  const newAmount = document.getElementById("amount");
+  const select = document.getElementById("select");
+
+  const productObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === "attributes" || mutation.attributeName === "type") {
+        if (productName.type !== "text") {
+          productName.type = "text";
+        }
+      }
+    });
+  });
+  productObserver.observe(productName, {
+    attributes: true,
+    attributeFilter: ["type"],
+  });
+
+  const priceObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === "attributes" || mutation.attributeName === "type") {
+        if (newPrice.type !== "number") {
+          console.log("Input type changed to text");
+          newPrice.type = "number";
+        }
+      }
+    });
+  });
+  priceObserver.observe(newPrice, {
+    attributes: true,
+    attributeFilter: ["type"],
+  });
+
+  const amountObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === "attributes" && mutation.attributeName === "type") {
+        if (newAmount.type !== "number") {
+          console.log("Input type changed to text");
+          newAmount.type = "number";
+        }
+      }
+    });
+  });
+  amountObserver.observe(newAmount, {
+    attributes: true,
+    attributeFilter: ["type"],
+  });
+
+  const selectObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (
+        mutation.type === "childList" ||
+        mutation.type === "attributes" ||
+        mutation.type === "subtree" ||
+        mutation.type === "characterData"
+      ) {
+        console.log("Select options changed");
+        window.location.reload();
+        getCategories();
+      }
+    });
+  });
+  selectObserver.observe(select, {
+    childList: true,
+    attributes: true,
+    subtree: true,
+    characterData: true,
+  });
+</script>

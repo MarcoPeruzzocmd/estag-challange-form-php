@@ -15,6 +15,11 @@ class CategoryController
     }
     public function createCategory($category, $tax)
     {
+        if (!preg_match('/^[a-zA-ZÀ-ÿ][a-zA-ZÀ-ÿ0-9\s]*$/', $category)){
+            $_SESSION['error'] = 'O primeiro caractere precisa obrigatoriamente ser uma letra.';
+            header("Location: category.php");
+            exit();
+        }
         if (empty($category) || empty($tax)) {
             $_SESSION['error'] = 'Preencha todos os campos';
             header("Location: category.php");
@@ -31,7 +36,7 @@ class CategoryController
             exit();
         }
         if ($tax > 100) {
-            $_SESSION['error'] = 'O valor de impor deve ser de no máximo 100%';
+            $_SESSION['error'] = 'O valor de imposto deve ser de no máximo 100%';
             header("Location: category.php");
             exit();
         }
@@ -58,8 +63,10 @@ class CategoryController
     }
     public function existCategory($category)
     {
+        $normalized = strtolower(preg_replace('/\s+/', ' ', trim($category)));
         foreach ($this->category->getCategories() as $cat) {
-            if (strtolower(trim($cat['name'])) == strtolower(trim($category))) {
+            $existingName = strtolower(preg_replace('/\s+/', ' ', trim($cat['name'])));
+            if ($existingName == $normalized) {
                 return true;
             }
         }

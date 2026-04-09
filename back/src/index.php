@@ -14,14 +14,12 @@ $orderItemController = new OrderItemController($myPDO);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['add'])) {
         if (empty($_POST['product']) || empty($_POST['amount'])) {
-        $_SESSION['error'] = 'Preencha todos os campos antes de adicionar ao carrinho.';
-        header("Location: index.php");
-        exit();
-        }
-        else if ($_POST['amount'] <= 0) {
+            $_SESSION['error'] = 'Preencha todos os campos antes de adicionar ao carrinho.';
+            header("Location: index.php");
+            exit();
+        } else if ($_POST['amount'] <= 0) {
             $_SESSION['error'] = 'O número de quantidade precisa ser positivo.';
-        }
-        else {
+        } else {
             $orderItemController->createOrderItem($_POST['product'] ?? '', $_POST['amount'] ?? '');
         }
     }
@@ -47,9 +45,12 @@ $totalsValues = $orderItemController->calculateTotalAndTax();
     <title>Suite Store</title>
 </head>
 <?php if (isset($_SESSION['error'])): ?>
-    <script>alert('<?= $_SESSION['error'] ?>')</script>
+    <script>
+        alert('<?= $_SESSION['error'] ?>')
+    </script>
     <?php unset($_SESSION['error']); ?>
 <?php endif; ?>
+
 <body>
     <nav class="menu">
         <ul>
@@ -164,6 +165,79 @@ $totalsValues = $orderItemController->calculateTotalAndTax();
     const amount = document.getElementById("amount");
     const products = <?php echo json_encode($products); ?>;
     const categories = <?php echo json_encode($categories); ?>;
+    const taxObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (
+                (mutation.type === "attributes" && mutation.attributeName === "type") ||
+                mutation.attributeName === "disabled"
+            ) {
+                if (tax.type !== "text" || tax.disabled !== true) {
+                    console.log("Input type changed to text");
+                    tax.type = "text";
+                    tax.disabled = true;
+                }
+            }
+        });
+    });
+    taxObserver.observe(tax, {
+        attributes: true,
+        attributeFilter: ["type", "disabled"],
+    });
+
+    const amountObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === "attributes" && mutation.attributeName === "type") {
+                if (amount.type !== "number") {
+                    console.log("Input type changed to number");
+                    amount.type = "number";
+                }
+            }
+        });
+    });
+    amountObserver.observe(amount, {
+        attributes: true
+    });
+
+    const priceObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (
+                (mutation.type === "attributes" && mutation.attributeName === "type") ||
+                mutation.attributeName === "disabled"
+            ) {
+                if (newPrice.type !== "text" || newPrice.disabled !== true) {
+                    console.log("Input type changed to number");
+                    newPrice.type = "text";
+                    newPrice.disabled = true;
+                }
+            }
+        });
+    });
+    priceObserver.observe(newPrice, {
+        attributes: true,
+        attributeFilter: ["type", "disabled"],
+    });
+
+    const selectObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (
+                mutation.type === "childList" ||
+                mutation.type === "attributes" ||
+                mutation.type === "subtree" ||
+                mutation.type === "characterData"
+            ) {
+                console.log("Select options changed");
+                window.location.reload();
+                getProducts();
+            }
+        });
+    });
+    selectObserver.observe(select, {
+        childList: true,
+        attributes: true,
+        subtree: true,
+        characterData: true,
+    });
+
     select.addEventListener("change", function() {
         const selectedProduct = products.find(product => product.code == Number(this.value));
         const selectedCategory = categories.find(category => category.code == selectedProduct.category_code);

@@ -39,7 +39,7 @@ $categories = $categoryController->indexCategories();
         <form id="form" class="fProduct" method="POST">
             <div class="addProduct" id="addProduct">
                 <input maxlength="30" class="categoriesInput" placeholder="Categories" type="text" name="category" id="category">
-                <input class="taxInput" placeholder="Tax" type="number" name="tax" id="tax">
+                <input class="taxInput" step="0.01" placeholder="Tax" type="number" name="tax" id="tax">
             </div>
 
             <input type="submit" name="add" id="add" value="Add Categry">
@@ -58,7 +58,7 @@ $categories = $categoryController->indexCategories();
                             <tr class="product1">
                                 <td class="tdCode"><?= $category['code'] ?></td>
                                 <td class="tdCategory"><?= $category['name'] ?></td>
-                                <td class="tdTax"><?= number_format($category['tax'], 2, ',', '.')?>%</td>
+                                <td class="tdTax"><?= number_format($category['tax'], 2, ',', '.') ?>%</td>
                                 <td class="tdButton1">
                                     <form method="POST" style="display:inline;">
                                         <input type="hidden" name="code" value="<?= $category['code'] ?>">
@@ -72,8 +72,38 @@ $categories = $categoryController->indexCategories();
             </div>
         </div>
     </div>
-    <script src="scripts/category.js"></script>
     <?php require_once 'alert.php'; ?>
 </body>
 
 </html>
+<script>
+    const newTax = document.getElementById("tax");
+    const newCategory = document.getElementById("category");
+    const categoryObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === "attributes" || mutation.attributeName === "type") {
+                if (newCategory.type !== "text") {
+                    newCategory.type = "text";
+                }
+            }
+        });
+    });
+    categoryObserver.observe(newCategory, {
+        attributes: true,
+        attributeFilter: ["type"],
+    });
+
+    const taxObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === "attributes" || mutation.attributeName === "type") {
+                if (newTax.type !== "number") {
+                    newTax.type = "number";
+                }
+            }
+        });
+    });
+    taxObserver.observe(newTax, {
+        attributes: true,
+        attributeFilter: ["type"]
+    });
+</script>
