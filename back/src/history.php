@@ -20,13 +20,13 @@ $ordersHistory = $ordersController->indexOrdersHistory();
 <body>
     <nav class="menu">
         <ul>
-            <li><a href="index.html">
+            <li><a href="index.php">
                     <h1>Suite Store</h1>
                 </a></li>
             <div class="links">
-                <li><a href="products.html">Products</a></li>
-                <li><a href="categories.html">Categories</a></li>
-                <li><a href="history.html">History</a></li>
+                <li><a href="product.php">Products</a></li>
+                <li><a href="category.php">Categories</a></li>
+                <li><a href="history.php">History</a></li>
             </div>
         </ul>
     </nav>
