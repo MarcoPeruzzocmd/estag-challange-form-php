@@ -1,4 +1,8 @@
 <?php
+ob_start(); 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once 'conn.php';
 require_once 'classes/OrderItemClass.php';
 require_once 'controllers/ProductController.php';
@@ -42,6 +46,7 @@ class OrderItemController
         $tax = $price * ($taxPercent / 100);
 
         if ($existingOrderItem) {
+
             if ($product['amount'] < $amount) {
                 $_SESSION['error'] = "Estoque insuficiente. Disponível: {$product['amount']}.";
                 header("Location: index.php");
@@ -74,5 +79,9 @@ class OrderItemController
     public function calculateTotalAndTax()
     {
         return $this->OrderItem->calculateTotalAndTax();
+    }
+    public function cancelOrder()
+    {
+        $this->OrderItem->cancelOrder();
     }
 }

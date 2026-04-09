@@ -56,13 +56,13 @@ $categories = $categoryController->indexCategories();
                     <tbody id="table">
                         <?php foreach ($categories as $category): ?>
                             <tr class="product1">
-                                <td class="tdCode"><?= $category['code'] ?></td>
+                                <td class="tdCode"><?= $category['display_code'] ?></td>
                                 <td class="tdCategory"><?= $category['name'] ?></td>
                                 <td class="tdTax"><?= number_format($category['tax'], 2, ',', '.') ?>%</td>
                                 <td class="tdButton1">
                                     <form method="POST" style="display:inline;">
                                         <input type="hidden" name="code" value="<?= $category['code'] ?>">
-                                        <input type="submit" name="delete" class="delete1" value="Delete">
+                                        <input type="submit" name="delete" class="delete1" value="Delete" onclick="return confirm('Tem certeza que deseja excluir a categoria?')">
                                     </form>
                                 </td>
                             </tr>

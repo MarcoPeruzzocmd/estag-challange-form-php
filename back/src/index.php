@@ -1,4 +1,5 @@
 <?php
+ob_start(); 
 session_start();
 require_once 'conn.php';
 require_once 'controllers/ProductController.php';
@@ -7,7 +8,7 @@ require_once 'controllers/CategoryController.php';
 
 $productController = new ProductController($myPDO);
 $categoryController = new CategoryController($myPDO);
-$products = $productController->indexProducts();
+$products = $productController->getProductsSelect();
 $categories = $categoryController->indexCategories();
 $orderItemController = new OrderItemController($myPDO);
 
@@ -30,6 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['finish'])) {
         $orderItemController->finishOrder($_POST['finish']);
     }
+    if (isset($_POST['cancel'])) {
+        $orderItemController->cancelOrder();
+    }
 }
 $ordersItem = $orderItemController->indexOrderItem();
 $totalsValues = $orderItemController->calculateTotalAndTax();
@@ -44,13 +48,6 @@ $totalsValues = $orderItemController->calculateTotalAndTax();
     <link rel="stylesheet" href="styles/index.css" />
     <title>Suite Store</title>
 </head>
-<?php if (isset($_SESSION['error'])): ?>
-    <script>
-        alert('<?= $_SESSION['error'] ?>')
-    </script>
-    <?php unset($_SESSION['error']); ?>
-<?php endif; ?>
-
 <body>
     <nav class="menu">
         <ul>
@@ -109,7 +106,7 @@ $totalsValues = $orderItemController->calculateTotalAndTax();
                     <tbody id="table">
                         <?php foreach ($ordersItem as $orderItem): ?>
                             <tr class="product1">
-                                <td class="tdCode"><?= $orderItem['code'] ?></td>
+                                <td class="tdCode"><?= $orderItem['display_code'] ?></td>
                                 <td class="tdProduct">
                                     <?php
                                     foreach ($products as $product) {
@@ -126,7 +123,7 @@ $totalsValues = $orderItemController->calculateTotalAndTax();
                                 <td class="tdButton1">
                                     <form method="POST" style="display:inline;">
                                         <input type="hidden" name="code" value="<?= $orderItem['code'] ?>">
-                                        <input type="submit" name="delete" class="delete1" value="Delete">
+                                        <input type="submit" name="delete" class="delete1" value="Delete" onclick="return confirm('Tem certeza que deseja excluir esse produto?')">
                                     </form>
                                 </td>
                             </tr>
@@ -145,8 +142,8 @@ $totalsValues = $orderItemController->calculateTotalAndTax();
                         </div>
                     </div>
                     <div class="buttonsCart">
-                        <button class="cancel">Cancel</button>
-                        <button name="finish" class="finish">Finish</button>
+                        <button class="cancel" name="cancel" onclick="return confirm('Tem certeza que deseja cancelar o pedido?')">Cancel </button>
+                        <button name="finish" class="finish" onclick="return confirm('Tem certeza que deseja finalizar o pedido?')">Finish</button>
                     </div>
                 </div>
             </div>

@@ -13,6 +13,9 @@ class ProductController {
     public function indexProducts(){
         return $this->product->getProducts();
     }
+    public function getProductsSelect(){
+        return $this->product->getProductsSelect();
+    }
     public function createProduct($name, $amount, $price, $category) {
         if (!preg_match('/^[a-zA-ZÀ-ÿ][a-zA-ZÀ-ÿ0-9\s]*$/', $name)){
             $_SESSION['error'] = 'O primeiro caractere precisa obrigatoriamente ser uma letra.';

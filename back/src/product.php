@@ -8,6 +8,7 @@ require_once 'controllers/CategoryController.php';
 $productController = new ProductController($myPDO);
 $categoryController = new CategoryController($myPDO);
 $categories = $categoryController->indexCategories();
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (isset($_POST['add'])) {
     $productController->createProduct($_POST['product'], $_POST['amount'] ?? '', $_POST['price'] ?? '', $_POST['category'] ?? '');
@@ -16,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 }
 $products = $productController->indexProducts();
+
 ?>
 <!doctype html>
 <html lang="pt-br">
@@ -79,7 +81,7 @@ $products = $productController->indexProducts();
           <tbody id="table">
             <?php foreach ($products as $product): ?>
               <tr class="product1">
-                <td class="tdCode"><?= $product['code'] ?></td>
+                <td class="tdCode"><?= $product['display_code'] ?></td>
                 <td class="tdProduct"><?= $product['name'] ?></td>
                 <td class="tdAmount"><?= $product['amount'] ?></td>
                 <td class="tdPrice">R$<?= number_format($product['price'], 2, ',', '.') ?></td>
@@ -95,7 +97,7 @@ $products = $productController->indexProducts();
                 <td class="tdActions">
                   <form method="POST" style="display:inline;">
                     <input type="hidden" name="code" value="<?= $product['code'] ?>">
-                    <input type="submit" name="delete" class="delete1" value="Delete">
+                    <input type="submit" name="delete" class="delete1" value="Delete" onclick="return confirm('Tem certeza que deseja excluir esse produto?')">
                   </form>
                 </td>
               </tr>

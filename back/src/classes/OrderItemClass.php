@@ -1,4 +1,8 @@
 <?php
+ob_start(); 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once 'controllers/ProductController.php';
 class OrderItem
 {
@@ -19,7 +23,7 @@ class OrderItem
         $product = $statement->fetch(PDO::FETCH_ASSOC);
 
         if ($product['amount'] < $amount) {
-            $_SESSION['error'] = "Estoque insuficiente para '{$product['name']}'. Disponível: {$product['amount']}.";
+            $_SESSION['error'] = "Estoque insuficiente para {$product['name']}. Disponível: {$product['amount']}.";
             header("Location: index.php");
             exit();
         }
@@ -33,17 +37,23 @@ class OrderItem
         $statement = $this->myPDO->prepare($sql);
         $statement->execute([$productCode]);
         $tax = $price * ($statement->fetch(PDO::FETCH_ASSOC)['tax'] / 100);
-
-        $sql = "INSERT INTO order_item (product_code, amount, price, tax) VALUES (?,?,?,?)";
-        $this->myPDO->prepare($sql)->execute([$productCode, $amount, $price, $tax]);
+        $display_code = $this->getNextDisplayCode();
+        $sql = "INSERT INTO order_item (display_code, product_code, amount, price, tax) VALUES (?,?,?,?,?)";
+        $this->myPDO->prepare($sql)->execute([$display_code, $productCode, $amount, $price, $tax]);
 
         $this->decrementAmount($productCode, $amount);
         header("Location: index.php");
         exit();
     }
+    public function getNextDisplayCode(){
+        $sql =  "SELECT MAX(display_code) FROM order_item";
+        $statement = $this->myPDO->query($sql);
+        $max = $statement->fetchColumn();
+        return $max ? $max + 1 : 1;
+    }
     public function getOrders()
     {
-        $sql = "SELECT *, price + tax AS total FROM order_item WHERE order_code IS NULL";
+        $sql = "SELECT *, price + tax AS total FROM order_item WHERE order_code IS NULL ORDER BY display_code ASC";
         $statement = $this->myPDO->query($sql);
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -93,5 +103,17 @@ class OrderItem
         $this->myPDO->prepare($sql)->execute([$orderCode]);
         header("Location: history.php");
         exit();
+    }
+    public function cancelOrder(){
+        $sql =  "SELECT product_code, amount FROM order_item WHERE order_code IS NULL";
+        $statement = $this->myPDO->query($sql);
+        $orderItems = $statement->fetchAll(PDO::FETCH_ASSOC);
+        foreach($orderItems as $item){
+            $sql = "UPDATE products SET amount = amount + ? WHERE code = ?";
+            $this->myPDO->prepare($sql)->execute([$item['amount'], $item['product_code']]);
+        }
+        $sql = "DELETE FROM order_item WHERE order_code IS NULL";
+        $this->myPDO->prepare($sql)->execute();
+        header("Location: index.php");
     }
 }
